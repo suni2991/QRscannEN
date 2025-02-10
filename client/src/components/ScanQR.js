@@ -3,6 +3,7 @@ import { Html5QrcodeScanner } from "html5-qrcode";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { message } from "antd";
+import '../css/QR.css';
 
 const ScanQR = () => {
   const [scannedData, setScannedData] = useState(null);
@@ -13,72 +14,35 @@ const ScanQR = () => {
 
   useEffect(() => {
     let scanner;
-    setIsScanning(true)
+    setIsScanning(true);
+  
+    const success = (decodedText, decodedResult) => {
+      console.log(`Code matched = ${decodedText}`, decodedResult);
+      // Do something with the decoded text or result
+      setScannedData(decodedResult);
+      setIsScanning(false);
+    };
+
+    const error = (errorMessage) => {
+      console.error(`QR Code scanning error: ${errorMessage}`);
+      // Handle error
+    };
+
     if (isScanning) {
-      scanner = new Html5QrcodeScanner("reader", {
-        qrbox: { width: 250, height: 250 },
-        fps: 10,
-        disableFlip: true,
-      });
-      scanner.render(success, error);
-    }
-
-    function success(result) {
-      scanner.clear().then(() => {
-        document.getElementById("reader").innerHTML = "";
-      });
-
-      try {
-        const resultData = result.split(" ");
-        if (resultData.length < 4) {
-          alert("Invalid QR code format. Please scan a valid QR code.");
-          return;
-        }
-
-        const fullName = resultData[1] + " " + resultData[2];
-        const email = resultData[3];
-        const department = resultData[4] + " " + resultData[5];
-
-        // Fetch existing status
-        fetch(`http://localhost:5000/get-status?email=${email}`)
-          .then((response) => response.json())
-          .then((data) => {
-            if (data.success) {
-              setExistingStatus(data.status);
-              setGiftStatus(data.giftStatus);
-
-              if (data.status === "Accepted") {
-                if (data.giftStatus) {
-                  alert("Invitee Attended & Gift also disbursed");
-                  navigate("/attendence");
-                  setIsScanning(false);
-                } else {
-                  setScannedData({ fullName, email, department, status: data.status });
-                  setIsScanning(false); // Stop scanning when showing details
-                }
-              } else {
-                setScannedData({ fullName, email, department, status: "new" });
-                setIsScanning(false); // Stop scanning when showing details
-              }
-            } else {
-              alert("Invitee not found. Please accept or reject the invitee.");
-              setScannedData({ fullName, email, department, status: "new" });
-              setIsScanning(false); // Stop scanning when showing details
-            }
-          })
-          .catch((error) => console.error("Error fetching status:", error));
-      } catch (err) {
-        console.error("Error parsing QR code:", err);
-        alert("Error reading QR code. Please try again.");
+      const readerElement = document.getElementById("reader");
+      if (readerElement) {
+        scanner = new Html5QrcodeScanner("reader", {
+          qrbox: { width: 250, height: 250 },
+          fps: 10,
+          disableFlip: true,
+        });
+        scanner.render(success, error);
+      } else {
+        console.error("Element with ID 'reader' not found in the DOM.");
+        setIsScanning(false); // Stop scanning if the element is not found
       }
     }
-
-    function error(err) {
-      if (!err.includes("NotFoundException")) {
-        console.error("QR code scan error:", err);
-      }
-    }
-
+  
     return () => {
       if (scanner) {
         scanner.clear().catch((err) => console.error("Cleanup error:", err));
@@ -178,24 +142,20 @@ const ScanQR = () => {
   };
 
   return (
-    <main style={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column" }}>
-      {/* <button onClick={toggleScanning} style={{ margin: "10px" }}>
-        {!isScanning ? "Start Scanning" : "Stop Scanning"}
-      </button> */}
-
+    <main className="scanDetails">
       <div id="reader" style={{ width: "600px", display: isScanning ? 'block' : 'none' }}></div>
 
       {scannedData && (
-        <div id="result" style={{ textAlign: "center", fontSize: "1.5rem" }}>
+        <div id="result" >
           <h2>Details</h2>
-          <p><strong>Full Name:</strong> {scannedData.fullName}</p>
-          <p><strong>Email:</strong> {scannedData.email}</p>
-          <p><strong>Department:</strong> {scannedData.department}</p>
-          <p><strong>Status:</strong> {existingStatus}</p>
-          <p><strong>Gift Status:</strong> {giftStatus ? "Received" : "Not Received"}</p>
+          <div><strong>Full Name:</strong> {scannedData.fullName}</div>
+          <div><strong>Email:</strong> {scannedData.email}</div>
+          <div><strong>Department:</strong> {scannedData.department}</div>
+          <div><strong>Status:</strong> {existingStatus}</div>
+          <div><strong>Gift Status:</strong> {giftStatus ? "Received" : "Not Received"}</div>
 
           {!existingStatus && (
-            <div>
+            <div className="acceptRejectBtns">
               <button
                 onClick={() => handleStatusChange("Accepted")}
                 style={{ margin: "10px" }}
