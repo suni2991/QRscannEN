@@ -12,27 +12,23 @@ const Attendence = () => {
 
   return (  
     <main style={{ 
-      display: "flex", 
-      flexDirection: "column", 
-      justifyContent: "space-between", 
-      alignItems: "center", 
-      height: "100vh", 
-      padding: "20px"
+      // display: "flex", 
+      // flexDirection: "column", 
+      // justifyContent: "space-between", 
+      // alignItems: "center", 
+      // height: "100vh", 
+      // padding: "20px"
     }}>
       
       {/* Header */}
       <div style={{ 
-        width: "600px", 
-        display: "flex", 
-        justifyContent: "space-between", 
-        alignItems: "center" 
       }}>
         <img src={logo} alt="Enfuse Logo" style={{ height: "50px" }} />
         <button onClick={handleNavigation}>Home</button>
       </div>
 
       {/* Middle Section */}
-      <div style={{ flex: 1, display: "flex", justifyContent: "center", alignItems: "center" }}>
+      <div>
         <ScannedQR />
       </div>
 

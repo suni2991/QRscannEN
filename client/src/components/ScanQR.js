@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Html5QrcodeScanner } from "html5-qrcode";
 import { useNavigate } from "react-router-dom";
+import '../css/QR.css';
 const ScanQR = () => {
   const [scannedData, setScannedData] = useState(null);
   const [status, setStatus] = useState("");
@@ -85,18 +86,18 @@ const ScanQR = () => {
   
 
   return (
-    <main style={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column" }}>
-      <div id="reader" style={{ width: "600px" }}></div>
+    <main className = "scanDetails">
+      <div id="reader"></div>
 
       {scannedData && (
-        <div id="result" style={{ textAlign: "center", fontSize: "1.5rem" }}>
+        <div id="result">
           <h2>Success!</h2>
-          <p><strong>Full Name:</strong> {scannedData.fullName}</p>
-          <p><strong>Email:</strong> {scannedData.email}</p>
-          <p><strong>Department:</strong> {scannedData.department}</p>
+          <div><label>Full Name:</label><p>{scannedData.fullName}</p></div>
+          <div><label>Email:</label> <p>{scannedData.email} </p></div>
+          <div><label>Department:</label><p>{scannedData.department}</p></div>
 
           {/* Show buttons after scanning */}
-          <div>
+          <div className="acceptRejectBtns">
             <button onClick={() => handleStatusChange("Accepted")} style={{ margin: "10px" }}>
               Accept
             </button>

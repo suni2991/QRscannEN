@@ -1,0 +1,30 @@
+.scanDetails{
+    display: flex; justify-content: center; align-items: center; flex-direction: column;margin:15px
+}
+
+.scanDetails #result{
+    text-align: left;
+    padding: 15px;
+    box-shadow: 0.75px 0.75px 0.75px 1px #dfdede;
+    background-color: #ede8e8;
+}
+
+.scanDetails #result h2{
+    text-align: center;
+}
+
+.scanDetails #result div{
+    margin: 15px 0;
+}
+.scanDetails #result label{
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+.scanDetails #result p{
+    font-size: 1.08rem;
+}
+
+.acceptRejectBtns{
+    text-align: center;
+}

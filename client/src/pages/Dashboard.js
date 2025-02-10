@@ -3,6 +3,7 @@ import ScanQR from "../components/ScanQR";
 import ScannedQR from "../components/ScannedQR";
 import { useNavigate } from "react-router-dom";
 import logo from  "./enfuse-logo.png";
+
 const Dashboard = () => {
   const [showScanQR, setShowScanQR] = useState(true);
   const navigate = useNavigate();
@@ -12,39 +13,32 @@ const Dashboard = () => {
   };
 
   return (
-    <main style={{ 
-      display: "flex", 
-      flexDirection: "column", 
-      justifyContent: "space-between", 
-      alignItems: "center", 
-      height: "100vh", 
-      padding: "10px"
-    }}>
+    <>
       
       {/* Header */}
-      <div style={{ 
-        width: "600px", 
+      <header style={{ 
         display: "flex", 
         justifyContent: "space-between", 
-        alignItems: "center" 
+        alignItems: "center",
+        backgroundColor:"white"
       }}>
-        <img src={logo} alt="Enfuse Logo" style={{ height: "50px" }} />
+        <img src={logo} alt="Enfuse Logo" style={{ height: "1.5rem" }} />
         <button onClick={toggleView}>
           {showScanQR ? "Attendence Data" : "Home" }
         </button>
-      </div>
+      </header>
 
       {/* Middle Section */}
-      <div style={{ flex: 1, display: "flex", justifyContent: "center", alignItems: "center" }}>
+      <main>
         {showScanQR ? <ScanQR /> : <ScannedQR />}
-      </div>
+      </main>
 
       {/* Footer */}
-      <div style={{ textAlign: "center", paddingBottom: "10px", background:"#00B4D2", width:"600px" }}>
-        <p>All rights reserved @ EnFuse Solutions Pvt Ltd</p>
-      </div>
+      <footer>
+        All rights reserved @ EnFuse Solutions Pvt Ltd
+      </footer>
 
-    </main>
+    </>
   );
 };
 
