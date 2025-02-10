@@ -195,7 +195,7 @@ const ScanQR = () => {
           <div><strong>Gift Status:</strong> {giftStatus ? "Received" : "Not Received"}</div>
 
           {!existingStatus && (
-            <div>
+            <div className="acceptRejectBtns">
               <button
                 onClick={() => handleStatusChange("Accepted")}
                 style={{ margin: "10px" }}
