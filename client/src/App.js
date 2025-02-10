@@ -6,17 +6,17 @@ import Dashboard from "./pages/Dashboard";
 import Home from "./pages/Home";
 import Attendence from "./pages/Attendence";
 import './App.css';
+
 const App = () => {
  return(
   <BrowserRouter>
   <AuthProvider>
-   
       <Routes>
         <Route path="/" element={<Home />} />
-        {/* <Route element={<RequireAuth />}> */}
+    
           <Route path="/dashboard" element={<Dashboard/>} />
           <Route path="/attendence" element={<Attendence />} />
-        {/* </Route> */}
+       
       </Routes>
   </AuthProvider>
   </BrowserRouter>

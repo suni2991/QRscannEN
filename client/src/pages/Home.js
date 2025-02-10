@@ -2,10 +2,11 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Button, Checkbox, Form, Input, message } from "antd";
 import "../styles/Home.css";// Import the CSS file
+import useAuth from "../hooks/useAuth";
 
 const Home = () => {
   const navigate = useNavigate();
-
+  const {auth} = useAuth();
   const onFinish = async (values) => {
     const { username, password } = values;
 
@@ -52,7 +53,7 @@ const Home = () => {
             
             name="username"
             rules={[
-              { required: true, message: "Please input your username!" },
+              { required: true, message: "Please Enter your username!" },
             ]}
           >
             <Input />
@@ -62,14 +63,10 @@ const Home = () => {
            
             name="password"
             rules={[
-              { required: true, message: "Please input your password!" },
+              { required: true, message: "Please Enter your password!" },
             ]}
           >
             <Input.Password />
-          </Form.Item>
-
-          <Form.Item name="remember" valuePropName="checked">
-            <Checkbox className="remember-me">Remember me</Checkbox>
           </Form.Item>
 
           <Form.Item>

@@ -12,6 +12,10 @@ const Dashboard = () => {
     setShowScanQR(prevState => !prevState);
   };
 
+  const handleLogout = () =>{
+    navigate('/');
+  }
+
   return (
     <>
       
@@ -23,17 +27,16 @@ const Dashboard = () => {
         backgroundColor:"white"
       }}>
         <img src={logo} alt="Enfuse Logo" style={{ height: "1.5rem" }} />
+        <button  onClick={handleLogout}>Logout</button>
         <button onClick={toggleView}>
           {showScanQR ? "Attendence Data" : "Home" }
         </button>
       </header>
 
-      {/* Middle Section */}
       <main>
         {showScanQR ? <ScanQR /> : <ScannedQR />}
       </main>
 
-      {/* Footer */}
       <footer>
         All rights reserved @ EnFuse Solutions Pvt Ltd
       </footer>
