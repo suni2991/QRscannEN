@@ -13,6 +13,7 @@ const ScanQR = () => {
 
   useEffect(() => {
     let scanner;
+    setIsScanning(true)
     if (isScanning) {
       scanner = new Html5QrcodeScanner("reader", {
         qrbox: { width: 250, height: 250 },
@@ -178,9 +179,9 @@ const ScanQR = () => {
 
   return (
     <main style={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column" }}>
-      <button onClick={toggleScanning} style={{ margin: "10px" }}>
+      {/* <button onClick={toggleScanning} style={{ margin: "10px" }}>
         {!isScanning ? "Start Scanning" : "Stop Scanning"}
-      </button>
+      </button> */}
 
       <div id="reader" style={{ width: "600px", display: isScanning ? 'block' : 'none' }}></div>
 
