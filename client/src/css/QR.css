@@ -1,5 +1,10 @@
 .scanDetails{
-    display: flex; justify-content: center; align-items: center; flex-direction: column;margin:15px
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    flex-direction: column;
+    margin:15px;
+    margin-top: 1.5rem;
 }
 
 .scanDetails #result{
@@ -7,15 +12,26 @@
     padding: 15px;
     box-shadow: 0.75px 0.75px 0.75px 1px #dfdede;
     background-color: #ede8e8;
+    max-height: 80vh;
+    overflow: auto;
 }
 
+.scanDetails #result #scannedEmail{
+font-size: 1rem;
+white-space: nowrap;
+  max-width: 16rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 .scanDetails #result h2{
     text-align: center;
+    margin: auto;
 }
 
 .scanDetails #result div{
     margin: 15px 0;
 }
+
 .scanDetails #result label{
     font-size: 1rem;
     font-weight: bold;
@@ -28,3 +44,13 @@
 .acceptRejectBtns{
     text-align: center;
 }
+
+#header #html5-qrcode-anchor-scan-type-change{
+    display: none;
+}
+
+#result .qrResultBtns{
+    text-align: center;
+    margin-top: 15px;
+}
+/* testing */

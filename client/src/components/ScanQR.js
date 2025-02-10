@@ -3,6 +3,7 @@ import { Html5QrcodeScanner } from "html5-qrcode";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { message } from "antd";
+import '../css/QR.css';
 
 const ScanQR = () => {
   const [scannedData, setScannedData] = useState(null);
@@ -186,16 +187,17 @@ const ScanQR = () => {
       <div id="reader"></div>
 
       {scannedData && (
-        <div id="result" style={{ textAlign: "center", fontSize: "1.5rem" }}>
+        <div id="result">
           <h2>Details</h2>
-          <div><strong>Full Name:</strong> {scannedData.fullName}</div>
-          <div><strong>Email:</strong> {scannedData.email}</div>
-          <div><strong>Department:</strong> {scannedData.department}</div>
-          <div><strong>Status:</strong> {existingStatus}</div>
-          <div><strong>Gift Status:</strong> {giftStatus ? "Received" : "Not Received"}</div>
+          <div><label>Full Name:</label><p>{scannedData.fullName}</p></div>
+          <div><label>Email:</label> <p id="scannedEmail">{scannedData.email} </p></div>
+          <div><label>Department:</label><p>{scannedData.department}</p></div>
+          <div><label>Status:</label><p>{existingStatus}</p></div>
+          <div><label>Department:</label><p>{scannedData.department}</p></div>
+          <div><label>Gift Status:</label> <p>{giftStatus ? "Received" : "Not Received"}</p></div>
 
           {!existingStatus && (
-            <div>
+            <div className = "qrResultBtns">
               <button
                 onClick={() => handleStatusChange("Accepted")}
                 style={{ margin: "10px" }}
@@ -212,7 +214,7 @@ const ScanQR = () => {
           )}
 
           {existingStatus === "Accepted" && !giftStatus && (
-            <div>
+            <div className = "qrResultBtns">
               <button onClick={() => checkGiftReceived(scannedData.email)} style={{ margin: "10px" }}>
                 Update Gift Status
               </button>
