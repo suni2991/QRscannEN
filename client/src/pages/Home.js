@@ -2,6 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Button, Checkbox, Form, Input, message } from "antd";
 import "../styles/Home.css";// Import the CSS file
+import logo from  "./enfuse-logo.png";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -39,7 +40,8 @@ const Home = () => {
   return (
     <div className="login-container">
       <div className="login-box">
-        <h2>Login</h2>
+        {/* <h2>Login</h2> */}
+        <img src = {logo} alt="Enfuse Logo" style={{ height: "30px",marginBottom:"20px" }} />
         <Form
           name="basic"
           layout="vertical"
@@ -49,32 +51,34 @@ const Home = () => {
           autoComplete="off"
         >
           <Form.Item
-            label="Username"
+            // label="Username"
             name="username"
+           
             rules={[
               { required: true, message: "Please input your username!" },
             ]}
           >
-            <Input />
+            <Input placeholder="Username" className = "login-input-field"/>
           </Form.Item>
 
           <Form.Item
-            label="Password"
+            // label="Password"
             name="password"
+            className = "login-input-field"
             rules={[
               { required: true, message: "Please input your password!" },
             ]}
           >
-            <Input.Password />
+            <Input.Password placeholder="Password" className = "login-input-field"/>
           </Form.Item>
 
           <Form.Item name="remember" valuePropName="checked">
-            <Checkbox className="remember-me">Remember me</Checkbox>
+            <Checkbox className="remember-me login-input-field">Remember me</Checkbox>
           </Form.Item>
 
-          <Form.Item>
+          <Form.Item className="login-btn">
             <Button type="primary" htmlType="submit">
-              Submit
+              Login
             </Button>
           </Form.Item>
         </Form>

@@ -72,7 +72,7 @@ const ScannedQR = () => {
         type="primary" 
         icon={<DownloadOutlined />} 
         onClick={downloadExcel} 
-        style={{ marginBottom: "20px" }}
+        style={{ marginBottom: "20px",backgroundColor:"green" }}
       >
         Download Excel
       </Button>

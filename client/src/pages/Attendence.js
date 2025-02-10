@@ -22,7 +22,7 @@ const Attendence = () => {
       
       {/* Header */}
       <div style={{ 
-        width: "600px", 
+        // width: "600px", 
         display: "flex", 
         justifyContent: "space-between", 
         alignItems: "center" 
