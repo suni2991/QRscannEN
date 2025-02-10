@@ -43,9 +43,10 @@ const ScannedQR = () => {
       key: "status",
     },
     {
-      title: "Gift Status",
-      dataIndex: "status",
-      key: "status",
+      title: "Gift Received",
+      dataIndex: "giftStatus",
+      key: "giftStatus",
+      render: (text) => (text ? "Yes" : "No"),
     },
   ];
 

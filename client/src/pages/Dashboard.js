@@ -11,6 +11,9 @@ const Dashboard = () => {
     setShowScanQR(prevState => !prevState);
   };
 
+  
+
+
   return (
     <main style={{ 
       display: "flex", 
