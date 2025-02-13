@@ -4,8 +4,10 @@ import RequireAuth from "./components/RequiredAuth";
 import { AuthProvider } from "./context/AuthProvider";
 import Dashboard from "./pages/Dashboard";
 import Home from "./pages/Home";
-import Attendence from "./pages/Attendence";
+
 import './App.css';
+import ScannedQR from "./components/ScannedQR";
+import ScanQR from "./components/ScanQR";
 const App = () => {
  return(
   <BrowserRouter>
@@ -13,10 +15,9 @@ const App = () => {
    
       <Routes>
         <Route path="/" element={<Home />} />
-        {/* <Route element={<RequireAuth />}> */}
+       
           <Route path="/dashboard" element={<Dashboard/>} />
-          <Route path="/attendence" element={<Attendence />} />
-        {/* </Route> */}
+          <Route path="/scan" element={<ScanQR />} /> 
       </Routes>
   </AuthProvider>
   </BrowserRouter>

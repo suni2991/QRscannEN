@@ -21,6 +21,7 @@ const invitationSchema = new mongoose.Schema({
   giftStatus: { type: Boolean, default: false },
   scannedBy: { type: String },
   scannedAt: Date,
+  note: {type:String, default: "Attendence Marked"}
 });
 
 const Invitation = mongoose.model("Invitation", invitationSchema);
@@ -30,7 +31,7 @@ mongoose.connect("mongodb://localhost:27017/qrscanner", { useNewUrlParser: true,
   .catch((err) => console.error(err));
 
 // Store scanned QR data
-app.post("/save-qr", async (req, res) => {
+app.post("/api/save-qr", async (req, res) => {
   try {
     const { fullName, email, department, status } = req.body;
 
@@ -76,14 +77,14 @@ app.post("/save-qr", async (req, res) => {
 });
 
 // Update gift status
-app.put("/update-gift-status", async (req, res) => {
+app.put("/api/update-gift-status", async (req, res) => {
   try {
-    const { email, giftStatus } = req.body;
+    const { email, giftStatus, note } = req.body;
 
-    // Update the existing invitation's gift status
+    // Update the existing invitation's gift status and note
     const invitation = await Invitation.findOneAndUpdate(
       { email },
-      { giftStatus },
+      { giftStatus, note }, // Include note in the update object
       { new: true }
     );
 
@@ -98,7 +99,7 @@ app.put("/update-gift-status", async (req, res) => {
 });
 
 // Retrieve all scanned QR codes
-app.get("/scanned-qr", async (req, res) => {
+app.get("/api/scanned-qr", async (req, res) => {
   try {
     const scannedInvites = await Invitation.find({ status: { $ne: "Pending" } })
       .populate("scannedBy", "fullName department email");
@@ -108,7 +109,7 @@ app.get("/scanned-qr", async (req, res) => {
   }
 });
 
-app.get("/get-status", async (req, res) => {
+app.get("/api/get-status", async (req, res) => {
   const { email } = req.query;
 
   try {
@@ -163,5 +164,5 @@ app.post('/api/login', async (req, res) => {
 });
 
 // Start Server
-const PORT = 5000;
+const PORT = 5090;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

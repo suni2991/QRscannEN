@@ -10,8 +10,8 @@ const ScanQR = () => {
   const [existingStatus, setExistingStatus] = useState(null);
   const [giftStatus, setGiftStatus] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
+  const [buttonClicked, setButtonClicked] = useState(false);
   const navigate = useNavigate();
-
   useEffect(() => {
     let scanner;
     setIsScanning(true)
@@ -19,7 +19,7 @@ const ScanQR = () => {
       scanner = new Html5QrcodeScanner("reader", {
         qrbox: { width: 250, height: 250 },
         fps: 10,
-        disableFlip: true,
+        disableFlip: false,
       });
       scanner.render(success, error);
     }
@@ -32,45 +32,36 @@ const ScanQR = () => {
       try {
         const resultData = result.split(" ");
         if (resultData.length < 4) {
-          alert("Invalid QR code format. Please scan a valid QR code.");
+          Swal.fire("Invalid QR code format", "Please scan a valid QR code.", "error");
           return;
         }
 
         const fullName = resultData[1] + " " + resultData[2];
         const email = resultData[3];
         const department = resultData[4];
-
         // Fetch existing status
-        fetch(`http://localhost:5000/get-status?email=${email}`)
+        fetch(`http://localhost:5090/api/get-status?email=${email}`)
           .then((response) => response.json())
           .then((data) => {
             if (data.success) {
               setExistingStatus(data.status);
               setGiftStatus(data.giftStatus);
-
-              if (data.status === "Accepted") {
-                if (data.giftStatus) {
-                  alert("Invitee Attended & Gift also disbursed");
-                  navigate("/attendence");
-                  setIsScanning(false);
-                } else {
-                  setScannedData({ fullName, email, department, status: data.status });
-                  setIsScanning(false); // Stop scanning when showing details
-                }
-              } else {
-                setScannedData({ fullName, email, department, status: "new" });
-                setIsScanning(false); // Stop scanning when showing details
+              setScannedData({ fullName, email, department });
+              setIsScanning(true); // Stop scanning when showing details
+              if (data.status === "Accepted" && data.giftStatus) {
+                Swal.fire("Invitee Attended & Gift also disbursed", "", "info");
               }
             } else {
-              alert("Invitee not found. Please accept or reject the invitee.");
-              setScannedData({ fullName, email, department, status: "new" });
-              setIsScanning(false); // Stop scanning when showing details
+              Swal.fire("Invitee not found", "Please accept or reject the invitee.", "warning");
+              setIsScanning(true); 
+              setScannedData({ fullName, email, department });
+             
             }
           })
           .catch((error) => console.error("Error fetching status:", error));
       } catch (err) {
         console.error("Error parsing QR code:", err);
-        alert("Error reading QR code. Please try again.");
+        Swal.fire("Error reading QR code", "Please try again.", "error");
       }
     }
 
@@ -92,10 +83,11 @@ const ScanQR = () => {
   };
 
   const handleStatusChange = (newStatus) => {
+    setButtonClicked(true);
     const updatedData = { ...scannedData, status: newStatus };
     setScannedData(updatedData);
-
-    fetch("http://localhost:5000/save-qr", {
+  
+    fetch("http://localhost:5090/api/save-qr", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -105,87 +97,64 @@ const ScanQR = () => {
       .then((response) => response.json())
       .then((data) => {
         if (!data.success) {
-          alert(data.message);
+          Swal.fire("Error", data.message, "error");
+          setButtonClicked(false); // Re-enable buttons if there is an error
         } else {
+          setButtonClicked(true);
+          Swal.fire("Success", "Attendance updated successfully!", "success");
           message.success("Attendance updated successfully!");
-
-          if (newStatus === "Accepted") {
-            checkGiftReceived(scannedData.email);
-          } else {
-            setTimeout(() => {
-              navigate("/attendence");
-              setIsScanning(false); // Stop scanning after handling status change
-            }, 500);
-          }
+          setIsScanning(true);
         }
       })
-      .catch((error) => console.error("Error:", error));
+      .catch((error) => {
+        console.error("Error:", error);
+        setButtonClicked(false); // Re-enable buttons if there is an error
+      });
   };
 
-  const saveNewInvitee = (inviteeData) => {
-    fetch("http://localhost:5000/save-qr", {
-      method: "POST",
+  const saveGiftStatus = (email, giftStatus, note) => {
+    fetch("http://localhost:5090/api/update-gift-status", {
+      method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(inviteeData),
+      body: JSON.stringify({ email, giftStatus, note }),
     })
       .then((response) => response.json())
       .then((data) => {
         if (data.success) {
-          message.success("New invitee recorded in the database!");
-          setTimeout(() => {
-            navigate("/attendence");
-            setIsScanning(false); // Stop scanning after saving new invitee
-          }, 500);
+          message.success("Gift status updated successfully!");
+          setIsScanning(true)
+          setButtonClicked(true);
+          navigate("/dashboard");
         } else {
-          alert("Failed to record new invitee.");
+          Swal.fire("Error", "Failed to update gift status.", "error");
         }
       })
       .catch((error) => console.error("Error:", error));
   };
 
-  const checkGiftReceived = (email) => {
+  const promptGiftStatus = (email) => {
     Swal.fire({
-      title: "Has the candidate received the gift?",
-      showDenyButton: true,
-      confirmButtonText: "Yes",
-      denyButtonText: "No",
+      title: 'Gift Status',
+      text: 'Has the invitee received the gift?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Yes',
+      cancelButtonText: 'No',
+      input: 'text',
+      inputPlaceholder: 'Answer with Yes or No'
     }).then((result) => {
       const giftStatus = result.isConfirmed;
-
-      fetch("http://localhost:5000/update-gift-status", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, giftStatus }),
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          if (data.success) {
-            message.success(`Gift status set to ${giftStatus ? "received" : "not received"}.`);
-            setIsScanning(false);
-          } else {
-            alert("Failed to update gift status.");
-          }
-          setTimeout(() => {
-            navigate("/attendence");
-            setIsScanning(false); // Stop scanning after updating gift status
-          }, 500);
-        })
-        .catch((error) => console.error("Error:", error));
+      const note = result.value; // Correctly access the input value
+      setGiftStatus(giftStatus);
+      saveGiftStatus(email, giftStatus, note);
     });
   };
 
   return (
     <main className="scanDetails">
-      {/* <button onClick={toggleScanning} style={{ margin: "10px" }}>
-        {!isScanning ? "Start Scanning" : "Stop Scanning"}
-      </button> */}
-
       <div id="reader"></div>
-
       {scannedData && (
         <div id="result">
           <h2>Details</h2>
@@ -193,30 +162,32 @@ const ScanQR = () => {
           <div><label>Email:</label> <p id="scannedEmail">{scannedData.email} </p></div>
           <div><label>Department:</label><p>{scannedData.department}</p></div>
           <div><label>Status:</label><p>{existingStatus}</p></div>
-          <div><label>Department:</label><p>{scannedData.department}</p></div>
           <div><label>Gift Status:</label> <p>{giftStatus ? "Received" : "Not Received"}</p></div>
-
-          {!existingStatus && (
-            <div className = "qrResultBtns">
+          {!existingStatus && !buttonClicked && (
+            <div className="qrResultBtns">
               <button
                 onClick={() => handleStatusChange("Accepted")}
                 style={{ margin: "10px" }}
+                disabled={buttonClicked}
               >
                 Accept
               </button>
               <button
                 onClick={() => handleStatusChange("Rejected")}
                 style={{ margin: "10px" }}
+                disabled={buttonClicked}
               >
                 Reject
               </button>
             </div>
           )}
-
           {existingStatus === "Accepted" && !giftStatus && (
-            <div className = "qrResultBtns">
-              <button onClick={() => checkGiftReceived(scannedData.email)} style={{ margin: "10px" }}>
-                Update Gift Status
+            <div className="qrResultBtns">
+              <button
+                onClick={() => promptGiftStatus(scannedData.email)}
+                style={{ margin: "10px" }}
+              >
+                Add Gift Status
               </button>
             </div>
           )}

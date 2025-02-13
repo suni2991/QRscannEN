@@ -1,0 +1,14 @@
+{
+  "files": {
+    "main.css": "/static/css/main.0eb9eef5.css",
+    "main.js": "/static/js/main.e2083965.js",
+    "static/media/enfuse_background.jpg": "/static/media/enfuse_background.61877514d1d15c69737f.jpg",
+    "index.html": "/index.html",
+    "main.0eb9eef5.css.map": "/static/css/main.0eb9eef5.css.map",
+    "main.e2083965.js.map": "/static/js/main.e2083965.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.0eb9eef5.css",
+    "static/js/main.e2083965.js"
+  ]
+}
