@@ -14,10 +14,10 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 const invitationSchema = new mongoose.Schema({
   fullName: String,
-  email: { type: String, unique: true, required: true },
+  empId: {type:Number},
+  emailId: { type: String, unique: true, required: true },
   department: String,
-  qrCode: String,
-  status: { type: String, enum:["Accepted", "Rejected"], default: "Pending" },
+  status: { type: String, enum:["Accepted", "Rejected", "Pending"], default: "Pending" },
   giftStatus: { type: Boolean, default: false },
   scannedBy: { type: String },
   scannedAt: Date,
@@ -26,52 +26,78 @@ const invitationSchema = new mongoose.Schema({
 
 const Invitation = mongoose.model("Invitation", invitationSchema);
 
-mongoose.connect("mongodb://localhost:27017/qrscanner", { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect("mongodb://localhost:27017/qrtest", { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log("MongoDB Connected"))
   .catch((err) => console.error(err));
 
 // Store scanned QR data
-app.post("/api/save-qr", async (req, res) => {
-  try {
-    const { fullName, email, department, status } = req.body;
+// app.post("/api/save-qr", async (req, res) => {
+//   try {
+//     const { fullName, emailId, department, status } = req.body;
 
-    // Find the existing invitation by email
-    let existingInvitation = await Invitation.findOne({ email });
+//     // Find the existing invitation by emailId
+//     let existingInvitation = await Invitation.findOne({ emailId });
 
-    if (existingInvitation) {
-      // Update the existing invitation
-      existingInvitation.status = "Accepted";
-      existingInvitation.giftStatus = true;  // Update giftStatus as well
-      existingInvitation.scannedAt = new Date();
+//     if (existingInvitation) {
+//       // Update the existing invitation
+//       existingInvitation.status = "Accepted";
+//       existingInvitation.giftStatus = true;  // Update giftStatus as well
+//       existingInvitation.scannedAt = new Date();
 
-      await existingInvitation.save();
+//       await existingInvitation.save();
 
-      return res.json({ 
-        success: true, 
-        message: `Invitee with email ${email} updated to status 'Accepted' and gift status updated!`, 
-        data: existingInvitation 
-      });
-    } else {
-      // If not found, create a new invitation
-      const invitation = new Invitation({
-        fullName,
-        email,
-        department,
-        status,
-        giftStatus: false,  // Set giftStatus to true for new invitation
-        scannedAt: new Date(),
-      });
+//       return res.json({ 
+//         success: true, 
+//         message: `Invitee with emailId ${emailId} updated to status 'Accepted' and gift status updated!`, 
+//         data: existingInvitation 
+//       });
+//     } else {
+//       // If not found, create a new invitation
+//       const invitation = new Invitation({
+//         fullName,
+//         emailId,
+//         department,
+//         status,
+//         giftStatus: false,  // Set giftStatus to true for new invitation
+//         scannedAt: new Date(),
+//       });
 
-      await invitation.save();
+//       await invitation.save();
 
-      res.json({ success: true, message: "QR Code processed successfully!", data: invitation });
-    }
-  } catch (error) {
-    // Handle duplicate key error explicitly
-    if (error.code === 11000) {
-      return res.status(400).json({ success: false, message: "Invitee already recorded" });
-    }
+//       res.json({ success: true, message: "QR Code processed successfully!", data: invitation });
+//     }
+//   } catch (error) {
+//     // Handle duplicate key error explicitly
+//     if (error.code === 11000) {
+//       return res.status(400).json({ success: false, message: "Invitee already recorded" });
+//     }
     
+//     res.status(500).json({ success: false, error: error.message });
+//   }
+// });
+
+app.put("/api/save-qr", async (req, res) => {
+  try {
+    const { emailId, status } = req.body;
+
+    let invitation = await Invitation.findOne({ emailId });
+
+    if (!invitation) {
+      return res.status(404).json({ success: false, message: "Invitee not found" });
+    }
+
+    if (invitation.status === "Accepted") {
+      return res.status(400).json({ success: false, message: "Invitee already accepted. Please update the gift status instead." });
+    }
+
+    invitation = await Invitation.findOneAndUpdate(
+      { emailId },
+      { status, note: "Attendance Marked", scannedAt: new Date() },
+      { new: true }
+    );
+
+    res.json({ success: true, message: "Status updated successfully!", data: invitation });
+  } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
 });
@@ -79,11 +105,11 @@ app.post("/api/save-qr", async (req, res) => {
 // Update gift status
 app.put("/api/update-gift-status", async (req, res) => {
   try {
-    const { email, giftStatus, note } = req.body;
+    const { emailId, giftStatus, note } = req.body;
 
     // Update the existing invitation's gift status and note
     const invitation = await Invitation.findOneAndUpdate(
-      { email },
+      { emailId },
       { giftStatus, note }, // Include note in the update object
       { new: true }
     );
@@ -102,7 +128,7 @@ app.put("/api/update-gift-status", async (req, res) => {
 app.get("/api/scanned-qr", async (req, res) => {
   try {
     const scannedInvites = await Invitation.find({ status: { $ne: "Pending" } })
-      .populate("scannedBy", "fullName department email");
+      .populate("scannedBy", "fullName department emailId");
     res.json({ success: true, data: scannedInvites });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -110,13 +136,13 @@ app.get("/api/scanned-qr", async (req, res) => {
 });
 
 app.get("/api/get-status", async (req, res) => {
-  const { email } = req.query;
+  const { emailId } = req.query;
 
   try {
-    const invite = await Invitation.findOne({ email });
+    const invite = await Invitation.findOne({ emailId });
 
     if (invite) {
-      res.json({ success: true, status: invite.status, giftStatus: invite.giftStatus });
+      res.json({ success: true, department: invite.department, status: invite.status, giftStatus: invite.giftStatus });
     } else {
       res.json({ success: false, message: "Invitee not found" });
     }
